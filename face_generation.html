@@ -13077,15 +13077,9 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Face-Generation">Face Generation<a class="anchor-link" href="#Face-Generation">&#182;</a></h1><p>In this project, you'll define and train a DCGAN on a dataset of faces. Your goal is to get a generator network to generate <em>new</em> images of faces that look as realistic as possible!</p>
-<p>The project will be broken down into a series of tasks from <strong>loading in data to defining and training adversarial networks</strong>. At the end of the notebook, you'll be able to visualize the results of your trained Generator to see how it performs; your generated samples should look like fairly realistic faces with small amounts of noise.</p>
-<h3 id="Get-the-Data">Get the Data<a class="anchor-link" href="#Get-the-Data">&#182;</a></h3><p>You'll be using the <a href="http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html">CelebFaces Attributes Dataset (CelebA)</a> to train your adversarial networks.</p>
-<p>This dataset is more complex than the number datasets (like MNIST or SVHN) you've been working with, and so, you should prepare to define deeper networks and train them for a longer time to get good results. It is suggested that you utilize a GPU for training.</p>
-<h3 id="Pre-processed-Data">Pre-processed Data<a class="anchor-link" href="#Pre-processed-Data">&#182;</a></h3><p>Since the project's main focus is on building the GANs, we've done <em>some</em> of the pre-processing for you. Each of the CelebA images has been cropped to remove parts of the image that don't include a face, then resized down to 64x64x3 NumPy images. Some sample data is show below.</p>
+<h1 id="Face-Generation">Face Generation<a class="anchor-link" href="#Face-Generation">&#182;</a></h1><p>I defined and trained a DCGAN on a dataset of faces. The goal is to get a generator network to generate <em>new</em> images of faces that look as realistic as possible.</p>
+<h2 id="Get-the-Data">Get the Data<a class="anchor-link" href="#Get-the-Data">&#182;</a></h2><p>I used the <a href="http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html">CelebFaces Attributes Dataset (CelebA)</a> to train the adversarial networks. Each of the CelebA images has been cropped to remove parts of the image that don't include a face, then resized down to 64x64x3 NumPy images. Some sample data is show below. This data can be downloaded <a href="https://s3.amazonaws.com/video.udacity-data.com/topher/2018/November/5be7eb6f_processed-celeba-small/processed-celeba-small.zip">by clicking here</a>.</p>
 <p><img src='assets/processed_face_data.png' width=60% /></p>
-<blockquote><p>If you are working locally, you can download this data <a href="https://s3.amazonaws.com/video.udacity-data.com/topher/2018/November/5be7eb6f_processed-celeba-small/processed-celeba-small.zip">by clicking here</a></p>
-</blockquote>
-<p>This is a zip file that you'll need to extract in the home directory of this notebook for further loading and processing. After extracting the data, you should be left with a directory of data <code>processed_celeba_small/</code></p>
 
 </div>
 </div>
@@ -13095,8 +13089,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># can comment out after executing</span>
-<span class="c1"># !unzip processed_celeba_small.zip</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># !unzip processed_celeba_small.zip</span>
 </pre></div>
 
     </div>
@@ -13111,9 +13104,6 @@ div#notebook {
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">data_dir</span> <span class="o">=</span> <span class="s1">&#39;processed_celeba_small/&#39;</span>
 
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">DON&#39;T MODIFY ANYTHING IN THIS CELL</span>
-<span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">pickle</span> <span class="k">as</span> <span class="nn">pkl</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -13131,16 +13121,8 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Visualize-the-CelebA-Data">Visualize the CelebA Data<a class="anchor-link" href="#Visualize-the-CelebA-Data">&#182;</a></h2><p>The <a href="http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html">CelebA</a> dataset contains over 200,000 celebrity images with annotations. Since you're going to be generating faces, you won't need the annotations, you'll only need the images. Note that these are color images with <a href="https://en.wikipedia.org/wiki/Channel_(digital_image">3 color channels (RGB)</a>#RGB_Images) each.</p>
-<h3 id="Pre-process-and-Load-the-Data">Pre-process and Load the Data<a class="anchor-link" href="#Pre-process-and-Load-the-Data">&#182;</a></h3><p>Since the project's main focus is on building the GANs, we've done <em>some</em> of the pre-processing for you. Each of the CelebA images has been cropped to remove parts of the image that don't include a face, then resized down to 64x64x3 NumPy images. This <em>pre-processed</em> dataset is a smaller subset of the very large CelebA data.</p>
-<blockquote><p>There are a few other steps that you'll need to <strong>transform</strong> this data and create a <strong>DataLoader</strong>.</p>
-</blockquote>
-<h4 id="Exercise:-Complete-the-following-get_dataloader-function,-such-that-it-satisfies-these-requirements:">Exercise: Complete the following <code>get_dataloader</code> function, such that it satisfies these requirements:<a class="anchor-link" href="#Exercise:-Complete-the-following-get_dataloader-function,-such-that-it-satisfies-these-requirements:">&#182;</a></h4><ul>
-<li>Your images should be square, Tensor images of size <code>image_size x image_size</code> in the x and y dimension.</li>
-<li>Your function should return a DataLoader that shuffles and batches these Tensor images.</li>
-</ul>
-<h4 id="ImageFolder">ImageFolder<a class="anchor-link" href="#ImageFolder">&#182;</a></h4><p>To create a dataset given a directory of images, it's recommended that you use PyTorch's <a href="https://pytorch.org/docs/stable/torchvision/datasets.html#imagefolder">ImageFolder</a> wrapper, with a root directory <code>processed_celeba_small/</code> and data transformation passed in.</p>
-
+<h2 id="Visualize-the-CelebA-Data">Visualize the CelebA Data<a class="anchor-link" href="#Visualize-the-CelebA-Data">&#182;</a></h2><p>The <a href="http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html">CelebA</a> dataset contains over 200,000 celebrity images with annotations.</p>
+<h3 id="Pre-process-and-Load-the-Data">Pre-process and Load the Data<a class="anchor-link" href="#Pre-process-and-Load-the-Data">&#182;</a></h3>
 </div>
 </div>
 </div>
@@ -13149,8 +13131,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># necessary imports</span>
-<span class="kn">import</span> <span class="nn">torch</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">torchvision</span> <span class="k">import</span> <span class="n">datasets</span>
 <span class="kn">from</span> <span class="nn">torchvision</span> <span class="k">import</span> <span class="n">transforms</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="k">import</span> <span class="n">DataLoader</span>
@@ -13200,12 +13181,7 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Create-a-DataLoader">Create a DataLoader<a class="anchor-link" href="#Create-a-DataLoader">&#182;</a></h2><h4 id="Exercise:-Create-a-DataLoader-celeba_train_loader-with-appropriate-hyperparameters.">Exercise: Create a DataLoader <code>celeba_train_loader</code> with appropriate hyperparameters.<a class="anchor-link" href="#Exercise:-Create-a-DataLoader-celeba_train_loader-with-appropriate-hyperparameters.">&#182;</a></h4><p>Call the above function and create a dataloader to view images.</p>
-<ul>
-<li>You can decide on any reasonable <code>batch_size</code> parameter</li>
-<li>Your <code>image_size</code> <strong>must be</strong> <code>32</code>. Resizing the data to a smaller size will make for faster training, while still creating convincing images of faces!</li>
-</ul>
-
+<h3 id="Create-a-DataLoader">Create a DataLoader<a class="anchor-link" href="#Create-a-DataLoader">&#182;</a></h3>
 </div>
 </div>
 </div>
@@ -13218,9 +13194,6 @@ div#notebook {
 <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">128</span>
 <span class="n">img_size</span> <span class="o">=</span> <span class="mi">32</span>
 
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">DON&#39;T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE</span>
-<span class="sd">&quot;&quot;&quot;</span>
 <span class="c1"># Call your function and get a dataloader</span>
 <span class="n">celeba_train_loader</span> <span class="o">=</span> <span class="n">get_dataloader</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">img_size</span><span class="p">)</span>
 </pre></div>
@@ -13229,15 +13202,6 @@ div#notebook {
 </div>
 </div>
 
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Next, you can view some images! You should seen square images of somewhat-centered faces.</p>
-<p>Note: You'll need to convert the Tensor images into a NumPy type and transpose the dimensions to correctly display an image, suggested <code>imshow</code> code is below, but it may not be perfect.</p>
-
-</div>
-</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
@@ -13249,9 +13213,6 @@ div#notebook {
     <span class="n">npimg</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">numpy</span><span class="p">()</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">npimg</span><span class="p">,</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span>
 
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">DON&#39;T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE</span>
-<span class="sd">&quot;&quot;&quot;</span>
 <span class="c1"># obtain one batch of training images</span>
 <span class="n">dataiter</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">celeba_train_loader</span><span class="p">)</span>
 <span class="n">images</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dataiter</span><span class="o">.</span><span class="n">next</span><span class="p">()</span> <span class="c1"># _ for no labels</span>
@@ -13294,8 +13255,7 @@ div#notebook {
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="Exercise:-Pre-process-your-image-data-and-scale-it-to-a-pixel-range-of--1-to-1">Exercise: Pre-process your image data and scale it to a pixel range of -1 to 1<a class="anchor-link" href="#Exercise:-Pre-process-your-image-data-and-scale-it-to-a-pixel-range-of--1-to-1">&#182;</a></h4><p>You need to do a bit of pre-processing; you know that the output of a <code>tanh</code> activated generator will contain pixel values in a range from -1 to 1, and so, we need to rescale our training images to a range of -1 to 1. (Right now, they are in a range from 0-1.)</p>
-
+<h3 id="Pre-process-the-image-data-and-scale-it-to-a-pixel-range-of--1-to-1">Pre-process the image data and scale it to a pixel range of -1 to 1<a class="anchor-link" href="#Pre-process-the-image-data-and-scale-it-to-a-pixel-range-of--1-to-1">&#182;</a></h3>
 </div>
 </div>
 </div>
@@ -13304,8 +13264,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># TODO: Complete the scale function</span>
-<span class="k">def</span> <span class="nf">scale</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">feature_range</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)):</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">scale</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">feature_range</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)):</span>
     <span class="sd">&#39;&#39;&#39; Scale takes in an image x and returns that image, scaled</span>
 <span class="sd">       with a feature_range of pixel values from -1 to 1. </span>
 <span class="sd">       This function assumes that the input x is already scaled from 0-1.&#39;&#39;&#39;</span>
@@ -13325,10 +13284,7 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">DON&#39;T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="c1"># check scaled range</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># check scaled range</span>
 <span class="c1"># should be close to -1 to 1</span>
 <span class="n">img</span> <span class="o">=</span> <span class="n">images</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 <span class="n">scaled_img</span> <span class="o">=</span> <span class="n">scale</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
@@ -13366,10 +13322,9 @@ Max:  tensor(0.5765)
 <div class="text_cell_render border-box-sizing rendered_html">
 <hr>
 <h1 id="Define-the-Model">Define the Model<a class="anchor-link" href="#Define-the-Model">&#182;</a></h1><p>A GAN is comprised of two adversarial networks, a discriminator and a generator.</p>
-<h2 id="Discriminator">Discriminator<a class="anchor-link" href="#Discriminator">&#182;</a></h2><p>Your first task will be to define the discriminator. This is a convolutional classifier like you've built before, only without any maxpooling layers. To deal with this complex data, it's suggested you use a deep network with <strong>normalization</strong>. You are also allowed to create any helper functions that may be useful.</p>
-<h4 id="Exercise:-Complete-the-Discriminator-class">Exercise: Complete the Discriminator class<a class="anchor-link" href="#Exercise:-Complete-the-Discriminator-class">&#182;</a></h4><ul>
+<h2 id="Discriminator">Discriminator<a class="anchor-link" href="#Discriminator">&#182;</a></h2><ul>
 <li>The inputs to the discriminator are 32x32x3 tensor images</li>
-<li>The output should be a single value that will indicate whether a given image is real or fake</li>
+<li>The output is a single value that will indicate whether a given image is real or fake</li>
 </ul>
 
 </div>
@@ -13459,11 +13414,6 @@ Max:  tensor(0.5765)
         <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fc</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>        
         <span class="k">return</span> <span class="n">out</span>
     
-
-
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">DON&#39;T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE</span>
-<span class="sd">&quot;&quot;&quot;</span>
 <span class="n">tests</span><span class="o">.</span><span class="n">test_discriminator</span><span class="p">(</span><span class="n">Discriminator</span><span class="p">)</span>
 </pre></div>
 
@@ -13493,10 +13443,10 @@ Max:  tensor(0.5765)
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Generator">Generator<a class="anchor-link" href="#Generator">&#182;</a></h2><p>The generator should upsample an input and generate a <em>new</em> image of the same size as our training data <code>32x32x3</code>. This should be mostly transpose convolutional layers with normalization applied to the outputs.</p>
-<h4 id="Exercise:-Complete-the-Generator-class">Exercise: Complete the Generator class<a class="anchor-link" href="#Exercise:-Complete-the-Generator-class">&#182;</a></h4><ul>
+<h2 id="Generator">Generator<a class="anchor-link" href="#Generator">&#182;</a></h2><p>The generator should upsample an input and generate a <em>new</em> image of the same size as the training data <code>32x32x3</code>.</p>
+<ul>
 <li>The inputs to the generator are vectors of some length <code>z_size</code></li>
-<li>The output should be a image of shape <code>32x32x3</code></li>
+<li>The output is a image of shape <code>32x32x3</code></li>
 </ul>
 
 </div>
@@ -13577,9 +13527,6 @@ Max:  tensor(0.5765)
         
         <span class="k">return</span> <span class="n">out</span>
 
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">DON&#39;T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE</span>
-<span class="sd">&quot;&quot;&quot;</span>
 <span class="n">tests</span><span class="o">.</span><span class="n">test_generator</span><span class="p">(</span><span class="n">Generator</span><span class="p">)</span>
 </pre></div>
 
@@ -13609,16 +13556,9 @@ Max:  tensor(0.5765)
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Initialize-the-weights-of-your-networks">Initialize the weights of your networks<a class="anchor-link" href="#Initialize-the-weights-of-your-networks">&#182;</a></h2><p>To help your models converge, you should initialize the weights of the convolutional and linear layers in your model. From reading the <a href="https://arxiv.org/pdf/1511.06434.pdf">original DCGAN paper</a>, they say:</p>
+<h2 id="Initialize-the-weights-of-your-networks">Initialize the weights of your networks<a class="anchor-link" href="#Initialize-the-weights-of-your-networks">&#182;</a></h2><p>To help the models converge, I initialize the weights of the convolutional and linear layers in the model. From reading the <a href="https://arxiv.org/pdf/1511.06434.pdf">original DCGAN paper</a>, they say:</p>
 <blockquote><p>All weights were initialized from a zero-centered Normal distribution with standard deviation 0.02.</p>
 </blockquote>
-<p>So, your next task will be to define a weight initialization function that does just this!</p>
-<p>You can refer back to the lesson on weight initialization or even consult existing model code, such as that from <a href="https://github.com/junyanz/pytorch-CycleGAN-and-pix2pix/blob/master/models/networks.py">the <code>networks.py</code> file in CycleGAN Github repository</a> to help you complete this function.</p>
-<h4 id="Exercise:-Complete-the-weight-initialization-function">Exercise: Complete the weight initialization function<a class="anchor-link" href="#Exercise:-Complete-the-weight-initialization-function">&#182;</a></h4><ul>
-<li>This should initialize only <strong>convolutional</strong> and <strong>linear</strong> layers</li>
-<li>Initialize the weights to a normal distribution, centered around 0, with a standard deviation of 0.02.</li>
-<li>The bias terms, if they exist, may be left alone or set to 0.</li>
-</ul>
 
 </div>
 </div>
@@ -13635,8 +13575,6 @@ Max:  tensor(0.5765)
 <span class="sd">    with mean = 0, std dev = 0.02.</span>
 <span class="sd">    :param m: A module or layer in a network    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># classname will be something like:</span>
-    <span class="c1"># `Conv`, `BatchNorm2d`, `Linear`, etc.</span>
     <span class="n">classname</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span>
         
     <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="s1">&#39;weight&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">((</span><span class="n">classname</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;Linear&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">classname</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;Conv2d&#39;</span><span class="p">)</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)):</span>
@@ -13654,7 +13592,7 @@ Max:  tensor(0.5765)
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Build-complete-network">Build complete network<a class="anchor-link" href="#Build-complete-network">&#182;</a></h2><p>Define your models' hyperparameters and instantiate the discriminator and generator from the classes defined above. Make sure you've passed in the correct input arguments.</p>
+<h2 id="Build-complete-network">Build complete network<a class="anchor-link" href="#Build-complete-network">&#182;</a></h2><p>Define your models' hyperparameters and instantiate the discriminator and generator from the classes defined above.</p>
 
 </div>
 </div>
@@ -13664,10 +13602,7 @@ Max:  tensor(0.5765)
 <div class="prompt input_prompt">In&nbsp;[15]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">DON&#39;T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="k">def</span> <span class="nf">build_network</span><span class="p">(</span><span class="n">d_conv_dim</span><span class="p">,</span> <span class="n">g_conv_dim</span><span class="p">,</span> <span class="n">z_size</span><span class="p">):</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">build_network</span><span class="p">(</span><span class="n">d_conv_dim</span><span class="p">,</span> <span class="n">g_conv_dim</span><span class="p">,</span> <span class="n">z_size</span><span class="p">):</span>
     <span class="c1"># define discriminator and generator</span>
     <span class="n">D</span> <span class="o">=</span> <span class="n">Discriminator</span><span class="p">(</span><span class="n">d_conv_dim</span><span class="p">)</span>
     <span class="n">G</span> <span class="o">=</span> <span class="n">Generator</span><span class="p">(</span><span class="n">z_size</span><span class="o">=</span><span class="n">z_size</span><span class="p">,</span> <span class="n">conv_dim</span><span class="o">=</span><span class="n">g_conv_dim</span><span class="p">)</span>
@@ -13691,7 +13626,7 @@ Max:  tensor(0.5765)
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="Exercise:-Define-model-hyperparameters">Exercise: Define model hyperparameters<a class="anchor-link" href="#Exercise:-Define-model-hyperparameters">&#182;</a></h4>
+<h3 id="Define-model-hyperparameters">Define model hyperparameters<a class="anchor-link" href="#Define-model-hyperparameters">&#182;</a></h3>
 </div>
 </div>
 </div>
@@ -13705,9 +13640,6 @@ Max:  tensor(0.5765)
 <span class="n">g_conv_dim</span> <span class="o">=</span> <span class="mi">64</span>
 <span class="n">z_size</span> <span class="o">=</span> <span class="mi">100</span>
 
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">DON&#39;T MODIFY ANYTHING IN THIS CELL THAT IS BELOW THIS LINE</span>
-<span class="sd">&quot;&quot;&quot;</span>
 <span class="n">D</span><span class="p">,</span> <span class="n">G</span> <span class="o">=</span> <span class="n">build_network</span><span class="p">(</span><span class="n">d_conv_dim</span><span class="p">,</span> <span class="n">g_conv_dim</span><span class="p">,</span> <span class="n">z_size</span><span class="p">)</span>
 </pre></div>
 
@@ -13765,15 +13697,7 @@ Generator(
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Training-on-GPU">Training on GPU<a class="anchor-link" href="#Training-on-GPU">&#182;</a></h3><p>Check if you can train on GPU. Here, we'll set this as a boolean variable <code>train_on_gpu</code>. Later, you'll be responsible for making sure that</p>
-<blockquote><ul>
-<li>Models,</li>
-<li>Model inputs, and</li>
-<li>Loss function arguments</li>
-</ul>
-</blockquote>
-<p>Are moved to GPU, where appropriate.</p>
-
+<h3 id="Training-on-GPU">Training on GPU<a class="anchor-link" href="#Training-on-GPU">&#182;</a></h3>
 </div>
 </div>
 </div>
@@ -13782,10 +13706,7 @@ Generator(
 <div class="prompt input_prompt">In&nbsp;[17]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">DON&#39;T MODIFY ANYTHING IN THIS CELL</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">torch</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">torch</span>
 
 <span class="c1"># Check for a GPU</span>
 <span class="n">train_on_gpu</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span>
@@ -13822,14 +13743,13 @@ Generator(
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <hr>
-<h2 id="Discriminator-and-Generator-Losses">Discriminator and Generator Losses<a class="anchor-link" href="#Discriminator-and-Generator-Losses">&#182;</a></h2><p>Now we need to calculate the losses for both types of adversarial networks.</p>
+<h2 id="Discriminator-and-Generator-Losses">Discriminator and Generator Losses<a class="anchor-link" href="#Discriminator-and-Generator-Losses">&#182;</a></h2><p>Now I need to calculate the losses for both types of adversarial networks.</p>
 <h3 id="Discriminator-Losses">Discriminator Losses<a class="anchor-link" href="#Discriminator-Losses">&#182;</a></h3><blockquote><ul>
 <li>For the discriminator, the total loss is the sum of the losses for real and fake images, <code>d_loss = d_real_loss + d_fake_loss</code>. </li>
 <li>Remember that we want the discriminator to output 1 for real images and 0 for fake images, so we need to set up the losses to reflect that.</li>
 </ul>
 </blockquote>
 <h3 id="Generator-Loss">Generator Loss<a class="anchor-link" href="#Generator-Loss">&#182;</a></h3><p>The generator loss will look similar only with flipped labels. The generator's goal is to get the discriminator to <em>think</em> its generated images are <em>real</em>.</p>
-<h4 id="Exercise:-Complete-real-and-fake-loss-functions">Exercise: Complete real and fake loss functions<a class="anchor-link" href="#Exercise:-Complete-real-and-fake-loss-functions">&#182;</a></h4><p><strong>You may choose to use either cross entropy or a least squares error loss to complete the following <code>real_loss</code> and <code>fake_loss</code> functions.</strong></p>
 
 </div>
 </div>
@@ -13881,7 +13801,7 @@ Generator(
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Optimizers">Optimizers<a class="anchor-link" href="#Optimizers">&#182;</a></h2><h4 id="Exercise:-Define-optimizers-for-your-Discriminator-(D)-and-Generator-(G)">Exercise: Define optimizers for your Discriminator (D) and Generator (G)<a class="anchor-link" href="#Exercise:-Define-optimizers-for-your-Discriminator-(D)-and-Generator-(G)">&#182;</a></h4><p>Define optimizers for your models with appropriate hyperparameters.</p>
+<h2 id="Optimizers">Optimizers<a class="anchor-link" href="#Optimizers">&#182;</a></h2><h4 id="Define-optimizers-for-the-Discriminator-(D)-and-Generator-(G)">Define optimizers for the Discriminator (D) and Generator (G)<a class="anchor-link" href="#Define-optimizers-for-the-Discriminator-(D)-and-Generator-(G)">&#182;</a></h4><p>Define optimizers for the models with appropriate hyperparameters.</p>
 
 </div>
 </div>
@@ -13912,20 +13832,11 @@ Generator(
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <hr>
-<h2 id="Training">Training<a class="anchor-link" href="#Training">&#182;</a></h2><p>Training will involve alternating between training the discriminator and the generator. You'll use your functions <code>real_loss</code> and <code>fake_loss</code> to help you calculate the discriminator losses.</p>
+<h2 id="Training">Training<a class="anchor-link" href="#Training">&#182;</a></h2><p>Training will involve alternating between training the discriminator and the generator. I use the functions <code>real_loss</code> and <code>fake_loss</code> to calculate the discriminator losses.</p>
 <ul>
-<li>You should train the discriminator by alternating on real and fake images</li>
-<li>Then the generator, which tries to trick the discriminator and should have an opposing loss function</li>
+<li>I train the discriminator by alternating on real and fake images</li>
+<li>Then the generator, which tries to trick the discriminator and has an opposing loss function</li>
 </ul>
-<h4 id="Saving-Samples">Saving Samples<a class="anchor-link" href="#Saving-Samples">&#182;</a></h4><p>You've been given some code to print out some loss statistics and save some generated "fake" samples.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div><div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="Exercise:-Complete-the-training-function">Exercise: Complete the training function<a class="anchor-link" href="#Exercise:-Complete-the-training-function">&#182;</a></h4><p>Keep in mind that, if you've moved your models to GPU, you'll also have to move any model inputs to GPU.</p>
 
 </div>
 </div>
@@ -13969,10 +13880,6 @@ Generator(
 
             <span class="n">batch_size</span> <span class="o">=</span> <span class="n">real_images</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
             <span class="n">real_images</span> <span class="o">=</span> <span class="n">scale</span><span class="p">(</span><span class="n">real_images</span><span class="p">)</span>
-
-            <span class="c1"># ===============================================</span>
-            <span class="c1">#         YOUR CODE HERE: TRAIN THE NETWORKS</span>
-            <span class="c1"># ===============================================</span>
             
             <span class="c1"># 1. Train the discriminator on real and fake images</span>
             <span class="n">d_optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
@@ -14008,7 +13915,7 @@ Generator(
             <span class="c1"># 2. Train the generator with an adversarial loss</span>
             <span class="n">g_optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
 
-            <span class="c1"># 1. Train with fake images and flipped labels</span>
+            <span class="c1"># 2.1. Train with fake images and flipped labels</span>
 
             <span class="c1"># Generate fake images</span>
             <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">z_size</span><span class="p">))</span>
@@ -14025,11 +13932,6 @@ Generator(
             <span class="c1"># perform backprop</span>
             <span class="n">g_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
             <span class="n">g_optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-            
-            
-            <span class="c1"># ===============================================</span>
-            <span class="c1">#              END OF YOUR CODE</span>
-            <span class="c1"># ===============================================</span>
 
             <span class="c1"># Print some loss stats</span>
             <span class="k">if</span> <span class="n">batch_i</span> <span class="o">%</span> <span class="n">print_every</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -14041,7 +13943,6 @@ Generator(
 
 
         <span class="c1">## AFTER EACH EPOCH##    </span>
-        <span class="c1"># this code assumes your generator is named G, feel free to change the name</span>
         <span class="c1"># generate and save sample, fake images</span>
         <span class="n">G</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span> <span class="c1"># for generating samples</span>
         <span class="n">samples_z</span> <span class="o">=</span> <span class="n">G</span><span class="p">(</span><span class="n">fixed_z</span><span class="p">)</span>
@@ -14077,10 +13978,6 @@ Generator(
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># set number of epochs </span>
 <span class="n">n_epochs</span> <span class="o">=</span> <span class="mi">20</span>
 
-
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">DON&#39;T MODIFY ANYTHING IN THIS CELL</span>
-<span class="sd">&quot;&quot;&quot;</span>
 <span class="c1"># call training function</span>
 <span class="n">losses</span> <span class="o">=</span> <span class="n">train</span><span class="p">(</span><span class="n">D</span><span class="p">,</span> <span class="n">G</span><span class="p">,</span> <span class="n">n_epochs</span><span class="o">=</span><span class="n">n_epochs</span><span class="p">)</span>
 </pre></div>
